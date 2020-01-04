@@ -1,0 +1,32 @@
+CREATE TABLE IF NOT EXISTS events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idTreatment INTEGER DEFAULT 0,
+    day INTEGER,
+    time INTEGER,
+    title TEXT NOT NULL,
+    description TEXT,
+    type INTEGER NOT NULL,
+    eventState INTEGER NOT NULL,
+    place TEXT DEFAULT "",
+    medicationType INTEGER DEFAULT 0,
+    quantity INTEGER DEFAULT 0,
+    applicationZone INTEGER DEFAULT 0
+)$
+CREATE TABLE IF NOT EXISTS treatments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    isPermanent INTEGER NOT NULL,
+    medicationName TEXT NOT NULL,
+    medicationType INTEGER NOT NULL,
+    applicationZones TEXT DEFAULT "",
+    lastDosisDate INTEGER DEFAULT 0,
+    lastDosisBodyZone INTEGER DEFAULT 0,
+    startDate INTEGER DEFAULT 0,
+    endDate INTEGER DEFAULT 0
+)$
+CREATE TABLE  IF NOT EXISTS config_dosis (
+    idTreatment INTEGER PRIMARY KEY,
+    frequencyDays INTEGER,
+    diaryTimes INTEGER,
+    dosisTime TEXT
+)
+

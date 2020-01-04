@@ -1,0 +1,57 @@
+import 'dart:async';
+
+import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:control_medico3/model/CEvent.dart';
+import 'package:control_medico3/model/Interfaces/Avisos.dart';
+import 'package:flutter/material.dart';
+
+
+
+
+void launchAlarm(){
+  
+  
+}
+
+/*Future sendNotification(CEvent cEvent){
+    var androidChannel = AndroidNotificationDetails(
+      'control-medicoId2227',
+      'control-medico2127',
+      'channel-description7',
+      importance: Importance.Max,
+      priority: Priority.Max,
+      style: AndroidNotificationStyle.Default,
+      sound: 'slow_spring_board',
+      playSound: true,
+      onlyAlertOnce: false
+    );
+
+    var iosChannel = IOSNotificationDetails();
+    var platformChannel = NotificationDetails(androidChannel, iosChannel);
+    
+    plugin.schedule(
+        cEvent.id, cEvent.title, cEvent.description, DateTime.now().add(Duration(seconds: 30)), platformChannel,
+        payload: cEvent.id.toString(),androidAllowWhileIdle: true);
+}*/
+
+
+
+class CAlarm implements Avisos{
+
+ 
+  CAlarm(){
+    
+  }
+  @override
+  Future<void> send(CEvent event) async {
+    await AndroidAlarmManager.oneShotAt(DateTime.now().add(Duration(seconds: 30)), event.id,launchAlarm,wakeup: true);
+    
+  }
+
+  @override
+  Future<void> cancel(CEvent event) async {
+
+    await AndroidAlarmManager.cancel(event.id);
+  }
+
+}

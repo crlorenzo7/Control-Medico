@@ -1,0 +1,1 @@
+const int INIT_INTERVAL_LENGTH = 14;
