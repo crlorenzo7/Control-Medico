@@ -1,15 +1,21 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:control_medico3/model/CEvent.dart';
 import 'package:control_medico3/model/Interfaces/Avisos.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 
 
 
-void launchAlarm(){
-  
+void launchAlarm() async{
+  if(Platform.isAndroid){
+      var methodChannel = MethodChannel("com.example.control_medico3.messages");
+      String data = await methodChannel.invokeMethod("scheduleAlarm");
+      debugPrint(data);
+    }
   
 }
 
@@ -44,7 +50,12 @@ class CAlarm implements Avisos{
   }
   @override
   Future<void> send(CEvent event) async {
-    await AndroidAlarmManager.oneShotAt(DateTime.now().add(Duration(seconds: 30)), event.id,launchAlarm,wakeup: true);
+    if(Platform.isAndroid){
+      var methodChannel = MethodChannel("com.example.control_medico3.messages");
+      String data = await methodChannel.invokeMethod("scheduleAlarm");
+      debugPrint(data);
+    }
+    //await AndroidAlarmManager.oneShotAt(DateTime.now().add(Duration(seconds: 30)), 0,launchAlarm,wakeup: true);
     
   }
 
