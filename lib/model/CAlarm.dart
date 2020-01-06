@@ -52,7 +52,9 @@ class CAlarm implements Avisos{
   Future<void> send(CEvent event) async {
     if(Platform.isAndroid){
       var methodChannel = MethodChannel("com.example.control_medico3.messages");
-      String data = await methodChannel.invokeMethod("scheduleAlarm");
+      Map<dynamic,dynamic> arg=new Map<dynamic,dynamic>();
+      arg["event"]=event.toMap();
+      String data = await methodChannel.invokeMethod("scheduleAlarm",arg);
       debugPrint(data);
     }
     //await AndroidAlarmManager.oneShotAt(DateTime.now().add(Duration(seconds: 30)), 0,launchAlarm,wakeup: true);
