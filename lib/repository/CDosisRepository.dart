@@ -1,4 +1,5 @@
 import 'package:control_medico3/dao/CEventDao.dart';
+import 'package:control_medico3/model/CAlarm.dart';
 import 'package:control_medico3/model/CDosis.dart';
 import 'package:control_medico3/model/CEvent.dart';
 import 'package:control_medico3/dao/CConfigDosisDao.dart';
@@ -48,7 +49,9 @@ class CDosisRepository{
           cDosis.type=CEventType.alarm;
           cDosis.title="Dosis "+cTreatment.medicationName;
 
-          await eventDao.createCEvent(cDosis);
+          int idEvent=await eventDao.createCEvent(cDosis);
+          cDosis.id=idEvent;
+          CAlarm().send(cDosis);
         }
       }
       initDay+=(cTreatment.configDosis.frequencyDays*24*3600);
@@ -57,11 +60,27 @@ class CDosisRepository{
     if(cTreatment.medicationType==MedicationType.inyeccion_subcutanea && cTreatment.isPermanent){
       cTreatment.getNextApplicationZone();
       cTreatment.lastDosisDate=BigInt.from(initDay);
+
+    }else{
+      cTreatment.lastDosisDate=BigInt.from(initDay+(cTreatment.configDosis.frequencyDays*24*3600));
     }
     await treatmentDao.updateCTreatment(cTreatment);
 
     
 
+  }
+
+  Future<bool> deleteAllDosisTreatment(CTreatment treatment) async{
+    Map<String,dynamic> query=Map();
+    query["idTreatment"]=treatment.id;
+    List<CEvent> dosisList=await eventDao.getCEvents(null,query);
+
+    for(int i=0;i<dosisList.length;i++){
+      CEvent dosis=dosisList[i];
+      await eventDao.deleteCEvent(dosis.id);
+      CAlarm().cancel(dosis);
+    }
+    return true;
   }
   
 }

@@ -1,0 +1,4 @@
+enum CTreatmentStatus{
+  active,
+  finished
+}

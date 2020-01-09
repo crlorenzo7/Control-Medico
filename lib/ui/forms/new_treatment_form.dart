@@ -23,8 +23,9 @@ import 'new_treatment/newTreatmentStepTwo.dart';
 
 class NewTreatmentForm extends StatefulWidget{
   
+  bool edition=false;
 
-  NewTreatmentForm();
+  NewTreatmentForm({this.edition=false});
 
   @override
   _NewTreatmentFormState createState() => _NewTreatmentFormState();
@@ -34,7 +35,6 @@ class NewTreatmentForm extends StatefulWidget{
 class _NewTreatmentFormState extends State<NewTreatmentForm>{
   final _formKey = GlobalKey<FormState>();
   int _formState=0;
-  Timer _timer;
   int currentStep=0;
   Map<String,dynamic> formData=new Map();
   void fixState(int state) {
@@ -61,8 +61,6 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
     return Scaffold(
               appBar: AppBar(
                 title: Text("Nuevo tratamiento",style: TextStyle(fontWeight: FontWeight.normal),textAlign: TextAlign.center),
-                
-                
               ),
               body:Builder(
                 builder:(context){
@@ -112,8 +110,13 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
           steps: [
             Step(
               title: Text("Datos"),
-              content: NewTreatmentStepOne(onContinue: (CTreatment treatment){
-                StoreProvider.of<AppState>(context).dispatch(AddTreatmentSubmitStepOne(treatment));
+              content: NewTreatmentStepOne(onContinue: (formData){
+                if(widget.edition){
+                  StoreProvider.of<AppState>(context).dispatch(UpdateTreatmentSubmitStepOne(formData));
+                }else{
+                  CTreatment treatment = CTreatment.fromMap(formData);
+                  StoreProvider.of<AppState>(context).dispatch(AddTreatmentSubmitStepOne(treatment));
+                }
                 setState((){currentStep++;});
               }),
               isActive: currentStep==0
@@ -121,7 +124,11 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
             Step(
               title: Text("Administracion"),
               content: NewTreatmentStepTwo(onContinue: (CTreatment treatment){
-                StoreProvider.of<AppState>(context).dispatch(AddTreatmentSubmitStepTwo(treatment));
+                if(widget.edition){
+                  StoreProvider.of<AppState>(context).dispatch(UpdateTreatmentSubmitStepTwo(treatment));
+                }else{
+                  StoreProvider.of<AppState>(context).dispatch(AddTreatmentSubmitStepTwo(treatment));
+                }
                 setState((){currentStep++;});
               },onGoBack: (){
                 setState(() {
@@ -132,10 +139,14 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
             ),
             Step(
               title: Text("dosis"),
-              content: NewTreatmentStepThree(onContinue: (CTreatment treatment){
+              content: NewTreatmentStepThree(onContinue: (CTreatment treatment) async{
+                if(widget.edition){
+                  StoreProvider.of<AppState>(context).dispatch(UpdateTreatmentAction(treatment));
+                }else{
+                  StoreProvider.of<AppState>(context).dispatch(AddTreatmentAction(treatment));
+                }
                 _showDialog();
-                StoreProvider.of<AppState>(context).dispatch(AddTreatmentAction(treatment));
-
+                //Navigator.of(context).pop();
                 //setState((){currentStep++;});
               },onGoBack: (){
                 setState(() {
@@ -150,7 +161,7 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
 
   }
 
-  void _showDialog() {
+  Future<bool> _showDialog() async {
     // flutter defined function
 
     Widget _buildLoaderDialog(){
@@ -172,6 +183,7 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
               child: new Text("ACEPTAR"),
               onPressed: () {
                 Navigator.of(context).pop();
+                
               },
             ),
           ],
@@ -179,7 +191,7 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
     
     }
 
-    showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
@@ -203,6 +215,7 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
               ); 
       },
     );
+    Navigator.of(context).pop();
   }
 
 }

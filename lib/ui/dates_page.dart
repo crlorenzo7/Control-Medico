@@ -63,6 +63,7 @@ class _DatesPageState extends State<DatesPage>{
                   child: FloatingActionButton(
                       child: Icon(Icons.add),
                       onPressed: () async{
+                          StoreProvider.of<AppState>(context).dispatch(InitFormAddDateAction());
                           final result = await Navigator.push(context,MaterialPageRoute(builder: (context) => NewDateForm()));
                           StoreProvider.of<AppState>(context).dispatch(LoadDatesAction());
                       },
@@ -89,7 +90,7 @@ class _DatesPageState extends State<DatesPage>{
               
               itemCount: dates.length,
               itemBuilder: (BuildContext context, int index) {
-                return DateItem(dates[index] as CDate);
+                return DateItem(dates[index] as CDate,true);
               }
             );
   }

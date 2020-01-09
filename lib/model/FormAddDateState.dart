@@ -1,16 +1,20 @@
+import 'CDate.dart';
+
 class FormAddDateState{
   final bool isProcessing;
   final bool error;
   final bool success;
+  final CDate date;
 
-  const FormAddDateState({this.isProcessing=false,this.error=false,this.success=false});
+  const FormAddDateState({this.isProcessing=false,this.error=false,this.success=false,this.date});
 
   factory FormAddDateState.loading() => FormAddDateState();
 
   factory FormAddDateState.fromStore(FormAddDateState state)=>FormAddDateState(
     isProcessing: state.isProcessing,
     error: state.error,
-    success: state.success
+    success: state.success,
+    date:CDate.fromMap(state.date.toMap())
     );
 
   @override

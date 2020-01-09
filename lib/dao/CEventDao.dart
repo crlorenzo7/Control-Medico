@@ -28,6 +28,10 @@ class CEventDao{
             whereClause+=" and title LIKE ?";
             whereArgs.add(v);
           } break;
+          case "idTreatment":{
+            whereClause+=" and idTreatment=?";
+            whereArgs.add(v);
+          }break;
           case "type":{
             whereClause+=" and type=?";
             whereArgs.add(v);

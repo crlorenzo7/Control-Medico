@@ -32,3 +32,36 @@ class DateCreatedAction{
 class DateNotCreatedAction{}
 
 class DateConfirmCreationAction{}
+
+class DeleteDateAction{
+  CDate cDate;
+  DeleteDateAction(CDate cDate){this.cDate=cDate;}
+}
+
+class DeletedDateAction{
+  int dateId;
+  DeletedDateAction(int dateId){this.dateId=dateId;}
+}
+
+class NotDeletedDateAction{}
+
+class InitFormAddDateAction{
+  
+}
+
+class InitFormUpdateDateAction{
+  CDate date;
+  InitFormUpdateDateAction(CDate date){this.date=date;}
+}
+
+class UpdateDateAction{
+  CDate date;
+  UpdateDateAction(CDate date){this.date=date;}
+}
+
+class DateUpdatedAction{
+  CDate date;
+  DateUpdatedAction(CDate date){this.date=date;}
+}
+
+class DateNotUpdatedAction{}

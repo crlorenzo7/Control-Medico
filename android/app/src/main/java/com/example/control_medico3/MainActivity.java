@@ -9,6 +9,8 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -52,13 +54,41 @@ public class MainActivity extends FlutterActivity {
         Log.e("MY_RECEIVER ", "on method call");
 
         if(methodCall.method.equals("scheduleAlarm")){
-          myIntent.putExtra("extra", "yes");
-          pending_intent = PendingIntent.getBroadcast(MainActivity.this, 0, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+          Map<String,Object> arg=new HashMap<String,Object>();
+          arg=methodCall.argument("event");
 
-          alarmManager.set(AlarmManager.RTC_WAKEUP, (Instant.now().toEpochMilli()+30000), pending_intent);
-          result.success("Service Started");
+          int type=Integer.parseInt(arg.get("type").toString());
+          Long timeMili=Long.parseLong(arg.get("time").toString())*1000L;
+          int id=Integer.parseInt(arg.get("id").toString());
+
+          myIntent.putExtra("title", arg.get("title").toString() );
+          myIntent.putExtra("type",type);
+          if(type==1){
+            myIntent.putExtra("rem_position",3);
+            myIntent.putExtra("original_time",timeMili);
+            myIntent.putExtra("id",id);
+            timeMili=timeMili - (24*3600000);
+          }
+
+
+          pending_intent = PendingIntent.getBroadcast(MainActivity.this, id, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+          alarmManager.set(AlarmManager.RTC_WAKEUP, timeMili, pending_intent);
+          result.success("alarm created");
+        }
+
+        if(methodCall.method.equals("cancelAlarm")){
+
+          int arg=methodCall.argument("id");
+
+          pending_intent = PendingIntent.getBroadcast(MainActivity.this, arg, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+          alarmManager.cancel(pending_intent);
+          result.success("alarm deleted");
         }
       }
+
+
     });
 
 

@@ -2,13 +2,14 @@ import 'dart:ffi';
 
 import 'package:control_medico3/actions/treatmentActions.dart';
 import 'package:control_medico3/model/AppState.dart';
+import 'package:control_medico3/model/CConfigDosis.dart';
 import 'package:control_medico3/model/CTreatment.dart';
 import 'package:control_medico3/model/FormAddTreatmentState.dart';
 import 'package:control_medico3/model/enumerations/CBodyZone.dart';
 import 'package:control_medico3/model/enumerations/MedicationType.dart';
+import 'package:control_medico3/time_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
@@ -40,13 +41,18 @@ class _NewTreatmentStepThreeState extends State<NewTreatmentStepThree> {
   var isDiary=false;
   int frequencyDays=1;
   int diaryTimes;
+  List<int> initialDosisTime=[];
   Map<String,dynamic> timelapseSelected;
   List<int> dosisTime=[null];
   bool isInitialised=false;
 
+  
+
   @override
   void initState() {
+    
     super.initState();
+
   }
 
   @override 
@@ -65,15 +71,20 @@ class _NewTreatmentStepThreeState extends State<NewTreatmentStepThree> {
           if(!isInitialised){
             isDiary=state.treatment.configDosis.frequencyDays==1 ? true:false;
             diaryTimes=state.treatment.configDosis.diaryTimes ?? 1;
+            initialDosisTime=state.treatment.configDosis.dosisTime ?? [];
             frequencyDays=state.treatment.configDosis.frequencyDays!=null ? state.treatment.configDosis.frequencyDays: 1;
             timelapseSelected=timelapses[0];
-            isInitialised=true;
+            
           }
 
           final childrenHour=<Widget>[];
 
           for(int i=0;i<diaryTimes;i++){
             childrenHour.add(_buildItemHour(context,i));
+          }
+
+          if(!isInitialised){
+            isInitialised=true;
           }
 
           return Form(
@@ -253,9 +264,14 @@ class _NewTreatmentStepThreeState extends State<NewTreatmentStepThree> {
                                 onPressed: (){
                                   if (_formKey.currentState.validate()) {
                                     CTreatment treatment = CTreatment.fromMap(state.treatment.toMap());
-                                    treatment.configDosis.diaryTimes = diaryTimes;
-                                    treatment.configDosis.frequencyDays=frequencyDays;
-                                    treatment.configDosis.dosisTime=dosisTime;
+                                    
+                                    CConfigDosis config=CConfigDosis.fromMap(state.treatment.configDosis.toMap());
+                                    config.diaryTimes = diaryTimes;
+                                    config.frequencyDays=frequencyDays;
+                                    config.dosisTime=dosisTime;
+                                    treatment.configDosis=config;
+                                    
+                                    
                                     
                                     /*List<int> applicationZones=ordenes.where((item)=>item!=null).map((item)=>item["zone"].index).toList().cast<int>();
                                     
@@ -286,13 +302,31 @@ class _NewTreatmentStepThreeState extends State<NewTreatmentStepThree> {
     
   }
 
+
+  
+
   Widget _buildItemHour(BuildContext context,int index){
     initializeDateFormatting();
     var formatter=new DateFormat("d 'de' MMMM 'de' yyyy","es");
     var formatterTime=new DateFormat("hh:mm a","es");
 
-    print(dosisTime[index]);
+    if(initialDosisTime.isNotEmpty && !isInitialised){
+      dosisTime[index]=initialDosisTime[index];
+    }
 
+    TextEditingController textTimeController;
+    FocusNode focusTime;
+
+    focusTime=FocusNode();
+    textTimeController=TextEditingController();
+    focusTime.addListener((){
+      if (focusTime.hasFocus) {
+        textTimeController.clear();
+      }
+    });
+    
+    print(dosisTime[index]);
+    //print(DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000).toString());
     return Container(
         height: 60,
         child:Row(
@@ -301,47 +335,41 @@ class _NewTreatmentStepThreeState extends State<NewTreatmentStepThree> {
             Expanded(
               child:Padding(
                 padding: EdgeInsets.only(left: 10),
-                child: DateTimeField(
-                  onChanged:(DateTime value){
-                    dosisTime[index]=(value.millisecondsSinceEpoch~/1000);
-                    
-                  } ,
-                  initialValue: dosisTime[index]!=null ? DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000):null,
-                  onSaved:(DateTime value){
-                    //formData["startDate"]=(value.millisecondsSinceEpoch~/1000);
-                    dosisTime[index]=(value.millisecondsSinceEpoch~/1000);
-                  } ,
-                  validator: (value){
-                    if (value==null) {
-                      return 'hora de la dosis';
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Hora de la dosis",
-                    suffixIcon: Icon(Icons.calendar_today)
+                child: Container(
+                  //color: Colors.black,
+                  child: Stack(
+                    children: <Widget>[
+                      
+                      TextFormField(
+                        controller: TextEditingController(text:dosisTime[index]!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000)).toUpperCase():null,),
+                        //initialValue: dosisTime[index]!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000)).toUpperCase():null,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Selecciona una hora';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: "Hora de la dosis",
+                          suffixIcon: Icon(Icons.query_builder)
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          int time=await TimeUtils().selectTime(context, dosisTime[index]);
+                          setState(() {
+                            dosisTime[index]=time;
+                          });
+                        },
+                        child:Container(
+                          color: Colors.transparent,
+                        ),
+                      )
+                      
+                      
+                    ],
                   ),
-                  format:formatterTime,
-                  onShowPicker: (context, currentValue) async{
-                    
-                    TimeOfDay selectedTime = await showTimePicker(
-                      initialTime: currentValue!=null ? TimeOfDay.fromDateTime(currentValue):TimeOfDay(hour: 0,minute: 0),
-                      context: context,
-                    );
-                    setState(() {
-                      dosisTime[index]=(selectedTime.hour*3600+selectedTime.minute*60);
-                    });
-                    return DateTimeField.convert(selectedTime);
-                    
-
-                    /*showDatePicker(
-                        context: context,
-                        firstDate: DateTime.now(),
-                        initialDate: currentValue ?? DateTime.now(),
-                        lastDate: DateTime(2100));*/
-                  },
-
-                ),
+                )
               )
             )
           ],
@@ -349,3 +377,4 @@ class _NewTreatmentStepThreeState extends State<NewTreatmentStepThree> {
       );
   }
 }
+
