@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS treatments (
     lastDosisDate INTEGER DEFAULT 0,
     lastDosisBodyZone INTEGER DEFAULT 0,
     startDate INTEGER DEFAULT 0,
-    endDate INTEGER DEFAULT 0
+    endDate INTEGER DEFAULT 0,
+    status INTEGER NOT NULL
 )$
 CREATE TABLE  IF NOT EXISTS config_dosis (
     idTreatment INTEGER PRIMARY KEY,

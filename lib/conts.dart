@@ -1,1 +1,1 @@
-const int INIT_INTERVAL_LENGTH = 14;
+const int INIT_INTERVAL_LENGTH = 28;

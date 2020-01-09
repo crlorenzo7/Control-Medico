@@ -80,7 +80,10 @@ class _HomePageState extends State<HomePage>{
                   ],
                 )
               ),
-              body:TabBarView(
+              body:Container(
+                color:Colors.white,
+                child:TabBarView(
+                
                     children: [
                       EventPage(onInit:() {
                           StoreProvider.of<AppState>(context).dispatch(LoadEventsAction());
@@ -94,6 +97,7 @@ class _HomePageState extends State<HomePage>{
                       Icon(Icons.calendar_today),
                     ],
                   )
+                )
             )
         ),
         Builder(

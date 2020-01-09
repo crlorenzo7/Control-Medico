@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:control_medico3/actions/treatmentActions.dart';
 import 'package:control_medico3/model/AppState.dart';
+import 'package:control_medico3/model/CConfigDosis.dart';
 import 'package:control_medico3/model/CTreatment.dart';
 import 'package:control_medico3/model/FormAddTreatmentState.dart';
 import 'package:control_medico3/model/enumerations/CBodyZone.dart';
@@ -13,6 +14,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:redux/redux.dart';
+
+import '../../../time_utils.dart';
 
 class NewTreatmentStepTwo extends StatefulWidget{
   
@@ -44,12 +47,22 @@ class _NewTreatmentStepTwoState extends State<NewTreatmentStepTwo> {
   List<Map<String,dynamic>> ordenes=[];
   DateTime lastDosisDate;
   bool isInitialised=false;
+  bool lastDosisInitialized=false;
   Map<String,dynamic> lastDosisBodyZone;
+  TextEditingController textTimeController;
+  FocusNode focusTime;
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
+    focusTime=FocusNode();
+    textTimeController=TextEditingController();
+    focusTime.addListener((){
+      if (focusTime.hasFocus) {
+        textTimeController.clear();
+      }
+    });
     super.initState();
   }
 
@@ -71,7 +84,7 @@ class _NewTreatmentStepTwoState extends State<NewTreatmentStepTwo> {
             initialSelected=state.treatment.applicationZones ?? [];
             lastDosisDate = state.treatment.lastDosisDate!=null ? DateTime.fromMillisecondsSinceEpoch(state.treatment.lastDosisDate.toInt()*1000):null;
             initialLastDosisBodyZone = state.treatment.lastDosisBodyZone!=-1 ? state.treatment.lastDosisBodyZone:null;
-            isInitialised=true;
+            
           }
 
           final children=<Widget>[];
@@ -88,9 +101,13 @@ class _NewTreatmentStepTwoState extends State<NewTreatmentStepTwo> {
             (i%2==0) ? childrenSelected.add(_builItemChecklistZoneSelected(context,i)) : childrenSelected2.add(_builItemChecklistZoneSelected(context,i));
           }
 
-          if(initialLastDosisBodyZone!=null){
+          
+          if(initialLastDosisBodyZone!=null && !lastDosisInitialized){
             lastDosisBodyZone=listBodyZones.where((item)=>item["zone"].index==initialLastDosisBodyZone).toList()[0];
-            
+            lastDosisInitialized=true;
+          }
+          if(!isInitialised){
+            isInitialised=true;
           }
 
           return state.treatment.medicationType==MedicationType.inyeccion_subcutanea ? Form(
@@ -133,36 +150,43 @@ class _NewTreatmentStepTwoState extends State<NewTreatmentStepTwo> {
                     return listBodyZones.where((item)=>item["value"]==true).toList().length>0 ? _buildRotationOrderSelector(context, childrenSelected, childrenSelected2):Container(height: 0,);
                   },
                 ),
-                
-                DateTimeField(
-                  onChanged:(DateTime value){
-                    //formData["startDate"]=(value.millisecondsSinceEpoch~/1000);
-                    lastDosisDate=value;
-                  } ,
-                  initialValue: lastDosisDate,
-                  onSaved:(DateTime value){
-                    //formData["startDate"]=(value.millisecondsSinceEpoch~/1000);
-                    lastDosisDate=value;
-                  } ,
-                  validator: (value){
-                    if (value==null) {
-                      return 'Selecciona una fecha para la cita';
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Fecha de la Ultima/Proxima Dosis",
-                    suffixIcon: Icon(Icons.calendar_today)
+                Container(
+                  //color: Colors.black,
+                  height:60,
+                  child: Stack(
+                    children: <Widget>[
+                      
+                      TextFormField(
+                        controller: TextEditingController(text:lastDosisDate!=null ? formatter.format(lastDosisDate):null,),
+                        //initialValue: dosisTime[index]!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000)).toUpperCase():null,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Selecciona una fecha';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: "Hora de la dosis",
+                          suffixIcon: Icon(Icons.calendar_today)
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          int date=await TimeUtils().selectDate(context, (lastDosisDate!=null ? (lastDosisDate.millisecondsSinceEpoch~/1000):null));
+                          if(date!=null){
+                            setState(() {
+                              lastDosisDate=DateTime.fromMillisecondsSinceEpoch(date*1000);
+                            });
+                          }
+                        },
+                        child:Container(
+                          color: Colors.transparent,
+                        ),
+                      )
+                      
+                      
+                    ],
                   ),
-                  format:formatter,
-                  onShowPicker: (context, currentValue) {
-                    return showDatePicker(
-                        context: context,
-                        firstDate: DateTime.now(),
-                        initialDate: currentValue ?? DateTime.now(),
-                        lastDate: DateTime(2100));
-                  },
-
                 ),
                 SizedBox(
                   height: 30,
@@ -245,6 +269,10 @@ class _NewTreatmentStepTwoState extends State<NewTreatmentStepTwo> {
                             onPressed: (){
                               if (_formKey.currentState.validate()) {
                                 CTreatment treatment = CTreatment.fromMap(state.treatment.toMap());
+                                if(state.treatment.configDosis!=null){
+                                  CConfigDosis config=CConfigDosis.fromMap(state.treatment.configDosis.toMap());
+                                  treatment.configDosis=config;
+                                }
                                 List<int> applicationZones=ordenes.where((item)=>item!=null).map((item)=>item["zone"].index).toList().cast<int>();
                                 
                                 treatment.setApplicationZones = applicationZones;
@@ -363,7 +391,7 @@ class _NewTreatmentStepTwoState extends State<NewTreatmentStepTwo> {
 
   Widget _builItemChecklistZone(BuildContext context,int index){
 
-    if(initialSelected.indexOf(listBodyZones[index]["zone"].index)!=-1){
+    if(initialSelected.indexOf(listBodyZones[index]["zone"].index)!=-1 && !isInitialised){
       listBodyZones[index]["value"]=true;
       listBodyZonesSelected.add(listBodyZones[index]);
       ordenes.add(listBodyZones[index]);

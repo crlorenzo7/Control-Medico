@@ -19,9 +19,9 @@ public class AlarmReceiver  extends BroadcastReceiver{
 
         // fetch extra strings from the intent
         // tells the app whether the user pressed the alarm on button or the alarm off button
-        String get_your_string = intent.getExtras().getString("title");
-
-        Log.e("What is the key? ", get_your_string);
+        String title = intent.getExtras().getString("title");
+        int type=intent.getExtras().getInt("type");
+        Log.e("What is the key? ", title);
 
         // fetch the extra longs from the intent
         // tells the app which value the user picked from the drop down menu/spinner
@@ -33,7 +33,13 @@ public class AlarmReceiver  extends BroadcastReceiver{
         Intent service_intent = new Intent(context, RingtonePlayingService.class);
 
         // pass the extra string from Receiver to the Ringtone Playing Service
-        service_intent.putExtra("title", get_your_string);
+        service_intent.putExtra("title", title);
+        service_intent.putExtra("type",type);
+        if(type==1){
+            service_intent.putExtra("rem_position",intent.getExtras().getInt("rem_position"));
+            service_intent.putExtra("original_time",intent.getExtras().getLong("original_time"));
+            service_intent.putExtra("id",intent.getExtras().getInt("id"));
+        }
         // pass the extra integer from the Receiver to the Ringtone Playing Service
         //service_intent.putExtra("whale_choice", get_your_whale_choice);
 

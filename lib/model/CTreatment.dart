@@ -2,6 +2,7 @@ import 'package:control_medico3/model/CConfigDosis.dart';
 import 'package:control_medico3/model/enumerations/MedicationType.dart';
 
 import 'enumerations/CBodyZone.dart';
+import 'enumerations/CTreatmentStatus.dart';
 
 class CTreatment{
   int id;
@@ -14,6 +15,7 @@ class CTreatment{
   BigInt startDate;
   BigInt endDate;
   CConfigDosis configDosis=CConfigDosis();
+  CTreatmentStatus status=CTreatmentStatus.active;
 
   CTreatment({
     this.id,
@@ -24,7 +26,8 @@ class CTreatment{
     this.lastDosisDate,
     this.lastDosisBodyZone=-1,
     this.startDate,
-    this.endDate
+    this.endDate,
+    this.status=CTreatmentStatus.active
     });
   
 
@@ -37,7 +40,8 @@ class CTreatment{
         lastDosisDate: json.containsKey("lastDosisDate") ? BigInt.from(json["lastDosisDate"]):null,
         lastDosisBodyZone: json.containsKey("lastDosisBodyZone") ? json["lastDosisBodyZone"]:-1,
         startDate: (json.containsKey("startDate") && json["startDate"]!=null) ? BigInt.from(json["startDate"]):null,
-        endDate: (json.containsKey("endDate") && json["endDate"]!=null) ? BigInt.from(json["endDate"]):null
+        endDate: (json.containsKey("endDate") && json["endDate"]!=null) ? BigInt.from(json["endDate"]):null,
+        status: json.containsKey("status") ? CTreatmentStatus.values[json["status"]]:CTreatmentStatus.active
       );
 
   Map<String, dynamic> toMap() => {
@@ -49,7 +53,8 @@ class CTreatment{
         "lastDosisDate": (lastDosisDate==null) ? 0:lastDosisDate.toInt(),
         "lastDosisBodyZone": lastDosisBodyZone,
         "startDate": startDate!=null ? startDate.toInt():0,
-        "endDate": endDate!=null ? endDate.toInt():0
+        "endDate": endDate!=null ? endDate.toInt():0,
+        "status":status.index
       };
   
   String get getMedicationName => medicationName;

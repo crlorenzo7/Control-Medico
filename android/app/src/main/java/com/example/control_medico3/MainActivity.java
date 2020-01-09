@@ -57,9 +57,20 @@ public class MainActivity extends FlutterActivity {
           Map<String,Object> arg=new HashMap<String,Object>();
           arg=methodCall.argument("event");
 
-          myIntent.putExtra("title", arg.get("title").toString() );
-          int timeMili=Integer.parseInt(arg.get("time").toString())*1000;
+          int type=Integer.parseInt(arg.get("type").toString());
+          Long timeMili=Long.parseLong(arg.get("time").toString())*1000L;
           int id=Integer.parseInt(arg.get("id").toString());
+
+          myIntent.putExtra("title", arg.get("title").toString() );
+          myIntent.putExtra("type",type);
+          if(type==1){
+            myIntent.putExtra("rem_position",3);
+            myIntent.putExtra("original_time",timeMili);
+            myIntent.putExtra("id",id);
+            timeMili=timeMili - (24*3600000);
+          }
+
+
           pending_intent = PendingIntent.getBroadcast(MainActivity.this, id, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
           alarmManager.set(AlarmManager.RTC_WAKEUP, timeMili, pending_intent);

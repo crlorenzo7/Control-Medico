@@ -9,18 +9,25 @@ class CDate extends CEvent{
   Avisos recordatorio;
   CLocation place;
 
-  CDate(Map<String, dynamic> mjson){
+  /*CDate(Map<String, dynamic> mjson){
     if(mjson.containsKey("place")){
       if(mjson["place"]!=""){
         this.place=json.decode(mjson["place"]);
       }
     }
     super.loadMap(mjson);
-  }
+  }*/
 
-  factory CDate.fromMap(Map<String, dynamic> json){
-    CDate date=new CDate(json);
-    date.loadMap(json);
+  CDate():super();
+
+  factory CDate.fromMap(Map<String, dynamic> mjson){
+    CDate date=new CDate();
+    if(mjson.containsKey("place")){
+      if(mjson["place"]!=""){
+        date.place=json.decode(mjson["place"]);
+      }
+    }
+    date.loadMap(mjson);
     return date;
   }
 

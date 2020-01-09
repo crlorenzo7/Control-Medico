@@ -72,25 +72,31 @@ class _DosisItemState extends State<DosisItem> {
                               ],
                             ),
                   ),
-                  InkWell(
-                    
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      margin: EdgeInsets.only(right: 15),
-                      decoration: BoxDecoration(
-                        color:Colors.white,
-                        borderRadius: BorderRadius.circular(1000),
-                        boxShadow: [BoxShadow(offset: Offset(0, 0),blurRadius: 0)]
-                        
-                      ),
-                      child:Icon(Icons.my_location,color: Colors.black,size: 18,)
-                    ),
-                  )
+                  Builder(builder: (context){
+                    return widget.dosis.medicationType==MedicationType.inyeccion_subcutanea ? _buildImage():Container(height: 0,width: 0,);
+                  },)
+                  
                   
                 ],
               )
             )
     );
+  }
+
+  Widget _buildImage(){
+
+    String image="zona_"+widget.dosis.applicationZone.toString().split(".")[1].toLowerCase()+".png";
+
+    return Container(
+              width: 50,
+              height: 50,
+              margin: EdgeInsets.only(right: 15),
+              decoration: BoxDecoration(
+                color:Colors.white,
+                
+                
+              ),
+              child:Image.asset("assets/images/"+image,fit: BoxFit.cover)
+            );
   }
 }

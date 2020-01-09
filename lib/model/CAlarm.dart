@@ -63,8 +63,11 @@ class CAlarm implements Avisos{
 
   @override
   Future<void> cancel(CEvent event) async {
-
-    await AndroidAlarmManager.cancel(event.id);
+    var methodChannel = MethodChannel("com.example.control_medico3.messages");
+      Map<dynamic,dynamic> arg=new Map<dynamic,dynamic>();
+      arg["id"]=event.id;
+      String data = await methodChannel.invokeMethod("cancelAlarm",arg);
+      debugPrint(data);
   }
 
 }

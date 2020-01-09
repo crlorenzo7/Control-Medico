@@ -1,6 +1,7 @@
 package com.example.control_medico3;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -39,15 +40,6 @@ public class RingtonePlayingService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("LocalService", "Received start id " + startId + ": " + intent);
 
-        // fetch the extra string from the alarm on/alarm off values
-        //String state = intent.getExtras().getString("extra");
-        // fetch the whale choice integer values
-        //Integer whale_sound_choice = intent.getExtras().getInt("whale_choice");
-
-        //Log.e("Ringtone extra is ", state);
-        //Log.e("Whale choice is ", whale_sound_choice.toString());
-
-        // put the notification here, test it out
         if(intent!=null){
             if(intent.getExtras().get("state")!=null){
                 int state=Integer.parseInt(intent.getExtras().get("state").toString());
@@ -58,6 +50,9 @@ public class RingtonePlayingService extends Service {
 
                 }
             }else{
+
+                int type=intent.getExtras().getInt("type");
+
                 Intent deleteIntent = new Intent(this, RingtonePlayingService.class);
                 deleteIntent.putExtra("state", 1);
                 PendingIntent deletePendingIntent = PendingIntent.getService(this,
@@ -65,25 +60,35 @@ public class RingtonePlayingService extends Service {
                         deleteIntent,
                         PendingIntent.FLAG_CANCEL_CURRENT);
 
-                // notification
-                // set up the notification service
+
                 NotificationManager notify_manager = (NotificationManager) getSystemService(NotificationManager.class);
-                // set up an intent that goes to the Main Activity
+
                 Intent intent_main_activity = new Intent(this.getApplicationContext(), MainActivity.class);
-                // set up a pending intent
+
                 PendingIntent pending_intent_main_activity = PendingIntent.getActivity(this, 0,
                         intent_main_activity, 0);
 
-                Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-                // make the notification parameters
+                Uri notSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
                 Intent intent1 = new Intent(this.getApplicationContext(), MainActivity.class);
                 PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent1, 0);
 
-                Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                String channelId = "message18";
-                Uri sound=Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.gallop);
-                Notification mNotification;
 
+
+                String channelIdAlarm = "control_medico/alarmas";
+                String channelIdReminder="control_medico/reminders";
+                String nameChannelAlarm="alarmas";
+                String nameChannelReminder="recordatorios";
+
+                Uri sound=Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.gallop);
+
+                String channelId=channelIdAlarm;
+                String nameChannel=nameChannelAlarm;
+                if(type==1){
+
+                    channelId=channelIdReminder;
+                    nameChannel=nameChannelReminder;
+                }
 
                 Notification.Builder builder = new Notification.Builder(this,channelId)
                         .setDefaults(Notification.DEFAULT_VIBRATE)
@@ -91,12 +96,16 @@ public class RingtonePlayingService extends Service {
                         .setContentTitle(intent.getExtras().getString("title"))
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentIntent(pIntent)
-                        .setOngoing(true)
                         .addAction(R.drawable.ic_launcher,"DISMISS",deletePendingIntent)
                         .setAutoCancel(true)
                         .setPriority(Notification.PRIORITY_MAX)
-                        .setCategory(Notification.CATEGORY_ALARM)
                         .setVisibility(Notification.VISIBILITY_PUBLIC);
+                if(type==1){
+                    builder.setCategory(Notification.CATEGORY_REMINDER);
+
+                }else{
+                    builder.setOngoing(true).setCategory(Notification.CATEGORY_ALARM);
+                }
 
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 {
@@ -104,17 +113,62 @@ public class RingtonePlayingService extends Service {
                             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                             .setUsage(AudioAttributes.USAGE_ALARM)
                             .build();
+                    AudioAttributes audioAttributes2 = new AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .build();
+
                     NotificationChannel channel = new NotificationChannel(
                             channelId,
-                            "messages17",
+                            nameChannel,
                             NotificationManager.IMPORTANCE_HIGH);
-
-                    channel.setSound(sound, audioAttributes);
+                    if(type==1){
+                        channel.setSound(notSound, audioAttributes2);
+                    }else {
+                        channel.setSound(sound, audioAttributes);
+                    }
 
                     notify_manager.createNotificationChannel(channel);
                     builder.setChannelId(channelId);
                 }
 
+                if(type==1){
+                    int rem_pos=intent.getExtras().getInt("rem_position");
+                    Long original_time=intent.getExtras().getLong("original_time");
+                    int id=intent.getExtras().getInt("id");
+                    if(rem_pos>0) {
+                        Intent myIntent = new Intent(getApplicationContext(), AlarmReceiver.class);
+                        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+                        myIntent.putExtra("title", intent.getExtras().getString("title"));
+                        myIntent.putExtra("type", type);
+
+                        myIntent.putExtra("rem_position", rem_pos - 1);
+                        myIntent.putExtra("original_time", original_time);
+                        myIntent.putExtra("id",id);
+                        Long timeMili = original_time;
+                        switch(rem_pos){
+                            case 3:
+                                timeMili-=(30*60000);
+                                builder.setContentText("mañana");
+                                break;
+                            case 2:
+                                timeMili-=(10*60000);
+                                builder.setContentText("en 30 minutos");
+                                break;
+                            case 1:
+                                builder.setContentText("en 10 minutos");
+                                break;
+                        }
+
+
+                        PendingIntent pending_intent = PendingIntent.getBroadcast(getApplicationContext(), id, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, timeMili, pending_intent);
+                    }else{
+                        builder.setContentText("ahora");
+                    }
+                }
 
                 startForeground(startId,builder.build());
             }

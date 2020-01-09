@@ -13,9 +13,11 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:redux/redux.dart';
 
+import '../../../time_utils.dart';
+
 class NewTreatmentStepOne extends StatefulWidget{
   
-  void Function(CTreatment treatment) onContinue;
+  void Function(Map<String,dynamic> formData) onContinue;
   NewTreatmentStepOne({this.onContinue});
 
   @override
@@ -27,6 +29,7 @@ class _NewTreatmentStepOneState extends State<NewTreatmentStepOne> {
  
   final _formKey = GlobalKey<FormState>();
 
+  int id=null;
   var isPermanent=false;
   bool isInitialised=false;
   MedicationType medicationType=MedicationType.inyeccion_subcutanea;
@@ -34,9 +37,29 @@ class _NewTreatmentStepOneState extends State<NewTreatmentStepOne> {
   DateTime startDate=DateTime.now();
   DateTime endDate=DateTime.now();
 
+  TextEditingController textStartDateController;
+  FocusNode focusStartDate;
+
+  TextEditingController textEndDateController;
+  FocusNode focusEndDate;
+
   @override
   void initState() {
     //medicationTypes=MedicationType.values;
+    focusStartDate=FocusNode();
+    textStartDateController=TextEditingController();
+    focusStartDate.addListener((){
+      if (focusStartDate.hasFocus) {
+        textStartDateController.clear();
+      }
+    });
+    focusEndDate=FocusNode();
+    textEndDateController=TextEditingController();
+    focusEndDate.addListener((){
+      if (focusEndDate.hasFocus) {
+        textEndDateController.clear();
+      }
+    });
     super.initState();
     /*var treatmentStore=StoreProvider.of<AppState>(context).state.formAddTreatment.treatment;
     if(treatmentStore!=null){
@@ -61,11 +84,13 @@ class _NewTreatmentStepOneState extends State<NewTreatmentStepOne> {
       converter: (Store<AppState> store) => store.state.formAddTreatment,
       builder: (context, state) {
           if(!isInitialised){
+            id=state.treatment.id ?? null;
             isPermanent=state.treatment.isPermanent ?? false;
             medicationType=state.treatment.medicationType ?? medicationType;
             medicationName=state.treatment.medicationName ?? "";
             startDate=state.treatment.startDate!=null ? DateTime.fromMillisecondsSinceEpoch(state.treatment.startDate.toInt()*1000):null;
             endDate=state.treatment.endDate!=null ? DateTime.fromMillisecondsSinceEpoch(state.treatment.endDate.toInt()*1000):null;
+            formData["id"]=id;
             formData["isPermanent"]=isPermanent;
             formData["medicationName"]=medicationName;
             formData["medicationType"]=medicationType.index;
@@ -133,14 +158,95 @@ class _NewTreatmentStepOneState extends State<NewTreatmentStepOne> {
                               return Container( 
                                 child: Column(
                                   children:<Widget>[
-                                        DateTimeField(
+                                    Container(
+                  //color: Colors.black,
+                                      height:60,
+                                      child: Stack(
+                                        children: <Widget>[
+                                          
+                                          TextFormField(
+                                            controller: TextEditingController(text:startDate!=null ? formatter.format(startDate):null,),
+                                            //initialValue: dosisTime[index]!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000)).toUpperCase():null,
+                                            validator: (value) {
+                                              if (value.isEmpty) {
+                                                return 'Selecciona una fecha';
+                                              }
+                                              return null;
+                                            },
+                                            decoration: InputDecoration(
+                                              hintText: "Inicio del tratamiento",
+                                              suffixIcon: Icon(Icons.calendar_today)
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              int date=await TimeUtils().selectDate(context, startDate != null ? (startDate.millisecondsSinceEpoch~/1000):null);
+                                              if(date!=null){
+                                                setState(() {
+                                                  formData["startDate"]=date;
+                                                  startDate=DateTime.fromMillisecondsSinceEpoch(date*1000);
+                                                });
+                                              }
+                                            },
+                                            child:Container(
+                                              color: Colors.transparent,
+                                            ),
+                                          )
+                                          
+                                          
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                  //color: Colors.black,
+                                      height:60,
+                                      child: Stack(
+                                        children: <Widget>[
+                                          
+                                          TextFormField(
+                                            controller: TextEditingController(text:endDate!=null ? formatter.format(endDate):null,),
+                                            //initialValue: dosisTime[index]!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000)).toUpperCase():null,
+                                            validator: (value) {
+                                              if (value.isEmpty) {
+                                                return 'Selecciona una fecha';
+                                              }
+                                              return null;
+                                            },
+                                            decoration: InputDecoration(
+                                              hintText: "Final del tratamiento",
+                                              suffixIcon: Icon(Icons.calendar_today)
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              int date=await TimeUtils().selectDate(context, endDate != null ? (endDate.millisecondsSinceEpoch~/1000):null);
+                                              if(date!=null){
+                                                setState(() {
+                                                  formData["endDate"]=date;
+                                                  endDate=DateTime.fromMillisecondsSinceEpoch(date*1000);
+                                                });
+                                              }
+                                            },
+                                            child:Container(
+                                              color: Colors.transparent,
+                                            ),
+                                          )
+                                          
+                                          
+                                        ],
+                                      ),
+                                    ),
+                                        /*DateTimeField(
+                                          focusNode: focusStartDate,
+                                          controller: textStartDateController,
+                                          enableInteractiveSelection: false,
                                           onChanged:(DateTime value){
-                                            formData["startDate"]=(value.millisecondsSinceEpoch~/1000);
+                                            formData["startDate"]=value != null ? (value.millisecondsSinceEpoch~/1000):null;
                                             startDate=value;
                                           } ,
                                           initialValue: startDate,
                                           onSaved:(DateTime value){
-                                            formData["startDate"]=(value.millisecondsSinceEpoch~/1000);
+                                            formData["startDate"]=value != null ? (value.millisecondsSinceEpoch~/1000):null;
                                             startDate=value;
                                           } ,
                                           validator: (value){
@@ -157,21 +263,24 @@ class _NewTreatmentStepOneState extends State<NewTreatmentStepOne> {
                                           onShowPicker: (context, currentValue) {
                                             return showDatePicker(
                                                 context: context,
-                                                firstDate: DateTime.now(),
+                                                firstDate: DateTime(1900),
                                                 initialDate: currentValue ?? DateTime.now(),
                                                 lastDate: DateTime(2100));
                                           },
 
                                         ),
                                         DateTimeField(
+                                          focusNode: focusEndDate,
+                                          controller: textEndDateController,
+                                          enableInteractiveSelection: false,
                                           onChanged:(DateTime value){
-                                            formData["endDate"]=(value.millisecondsSinceEpoch~/1000);
+                                            formData["endDate"]=value!=null ? (value.millisecondsSinceEpoch~/1000):null;
                                             endDate=value;
                                           } ,
                                           
                                           initialValue: endDate,
                                           onSaved:(DateTime value){
-                                            formData["endDate"]=(value.millisecondsSinceEpoch~/1000);
+                                            formData["endDate"]=value!=null ? (value.millisecondsSinceEpoch~/1000):null;
                                             endDate=value;
                                           } ,
                                           validator: (value){
@@ -198,7 +307,7 @@ class _NewTreatmentStepOneState extends State<NewTreatmentStepOne> {
                                                 lastDate: DateTime(2100));
                                           },
 
-                                        ),
+                                        ),*/
                                       ]
                                       
                                     )
@@ -266,8 +375,8 @@ class _NewTreatmentStepOneState extends State<NewTreatmentStepOne> {
                               onPressed: (){
                                 if (_formKey.currentState.validate()) {
                                   formData["isPermanent"]=formData["isPermanent"] ? 1:0;
-                                  CTreatment treatment = CTreatment.fromMap(formData);
-                                  widget.onContinue(treatment);
+                                  //CTreatment treatment = CTreatment.fromMap(formData);
+                                  widget.onContinue(formData);
                                 }
                               },
                             )

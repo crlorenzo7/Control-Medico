@@ -12,10 +12,14 @@ List<Middleware<AppState>> createStoreDatesMiddleware() {
 
   final loadDates = _createLoadDates(repository);
   final saveDate = _saveDate(repository);
+  final deleteDate = _deleteDate(repository);
+  final updateDate = _updateDate(repository);
 
   return [
     TypedMiddleware<AppState, LoadDatesAction>(loadDates),
     TypedMiddleware<AppState, AddDateAction>(saveDate),
+    TypedMiddleware<AppState, DeleteDateAction>(deleteDate),
+    TypedMiddleware<AppState, UpdateDateAction>(updateDate),
   ];
 }
 
@@ -44,6 +48,32 @@ Middleware<AppState> _saveDate(CEventRepository repository){
         action.date.id=id;
         CAlarm().send(action.date);
         store.dispatch(DateCreatedAction(action.date));
+      }
+    ).catchError((_) => store.dispatch(DateNotCreatedAction()));
+
+    next(action);
+  };
+}
+
+Middleware<AppState> _updateDate(CEventRepository repository){
+  return (Store<AppState> store, action, NextDispatcher next) {
+    repository.updateCEvent(action.date).then(
+      (id){
+        CAlarm().send(action.date);
+        store.dispatch(DateUpdatedAction(action.date));
+      }
+    ).catchError((_) => store.dispatch(DateNotUpdatedAction()));
+
+    next(action);
+  };
+}
+
+Middleware<AppState> _deleteDate(CEventRepository repository){
+  return (Store<AppState> store, action, NextDispatcher next) {
+    repository.deleteCEvent(action.cDate.id).then(
+      (id){
+        CAlarm().cancel(action.cDate);
+        store.dispatch(DeletedDateAction(action.cDate.id));
       }
     ).catchError((_) => store.dispatch(DateNotCreatedAction()));
 

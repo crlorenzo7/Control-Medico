@@ -11,5 +11,20 @@ bool addTreatmentProcessingReducer(bool state,action){
   if(action is TreatmentNotCreatedAction){
     return false;
   }
+  if(action is TreatmentUpdatedAction){
+    return false;
+  }
+  if(action is TreatmentNotUpdatedAction){
+    return false;
+  }
+  if(action is DeleteTreatmentAction){
+    return true;
+  }
+  if(action is DeletedTreatmentAction){
+    return false;
+  }
+  if(action is NotDeletedTreatmentAction){
+    return false;
+  }
   return state;
 }

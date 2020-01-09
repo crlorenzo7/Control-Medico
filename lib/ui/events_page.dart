@@ -52,10 +52,12 @@ class _EventPageState extends State<EventPage> {
 
   Widget _buildEventsList(List<CEvent> events){
     return events.isEmpty ? Column(
+      
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Center(
+                  
                   child:Text("No hay eventos en el horizonte",style: TextStyle(fontSize: 20),)
                 )
               ],
@@ -69,7 +71,7 @@ class _EventPageState extends State<EventPage> {
                 CEventType type=events[index].type;
                 switch(type){
                   case CEventType.alarm: return DosisItem(events[index] as CDosis);break;
-                  default: return DateItem(events[index] as CDate);break;
+                  default: return DateItem(events[index] as CDate,false);break;
                 }
 
               }
