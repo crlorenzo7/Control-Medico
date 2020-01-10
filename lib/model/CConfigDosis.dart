@@ -2,7 +2,7 @@ class CConfigDosis{
   int idTreatment;
   int frequencyDays;
   int diaryTimes;
-  List<int> dosisTime;
+  List<int> dosisTime=[];
 
   CConfigDosis({this.idTreatment,this.frequencyDays=1,this.diaryTimes=1,this.dosisTime});
 
@@ -10,14 +10,14 @@ class CConfigDosis{
         idTreatment: json["idTreatment"],
         frequencyDays: json["frequencyDays"],
         diaryTimes: json["diaryTimes"],
-        dosisTime: json.containsKey("dosisTime") ? json["dosisTime"].split(",").where((i)=>i!="").map((i)=>int.parse(i)).toList().cast<int>():[],
+        dosisTime: (json.containsKey("dosisTime") && json["dosisTime"]!=null) ? json["dosisTime"].split(",").where((i)=>i!="").map((i)=>int.parse(i)).toList().cast<int>():[],
       );
 
   Map<String, dynamic> toMap() => {
         "idTreatment":idTreatment,
         "frequencyDays": frequencyDays,
         "diaryTimes": diaryTimes,
-        "dosisTime": dosisTime.join(","),
+        "dosisTime": dosisTime!=null ? dosisTime.join(","):null,
       };
 
     int get getIdTreatment => idTreatment;

@@ -25,7 +25,7 @@ class TimeUtils{
         lastDate: DateTime(2101));
     if (picked != null && picked != current){
 
-      return (picked.millisecondsSinceEpoch~/1000);
+      return (DateTime(picked.year,picked.month,picked.day).millisecondsSinceEpoch~/1000);
       
     }
     return null;

@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="control_medico3"
+        android:label="Mi Control Medico"
         android:icon="@mipmap/ic_launcher">
         
         <receiver android:name=".AlarmReceiver" />

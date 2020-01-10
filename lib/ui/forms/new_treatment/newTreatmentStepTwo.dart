@@ -166,7 +166,7 @@ class _NewTreatmentStepTwoState extends State<NewTreatmentStepTwo> {
                           return null;
                         },
                         decoration: InputDecoration(
-                          hintText: "Hora de la dosis",
+                          hintText: "Fecha anterior/proxima dosis",
                           suffixIcon: Icon(Icons.calendar_today)
                         ),
                       ),

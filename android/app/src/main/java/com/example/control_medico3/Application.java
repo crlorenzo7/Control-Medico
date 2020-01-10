@@ -1,25 +1,23 @@
 package com.example.control_medico3;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.os.Build;
-
 import io.flutter.app.FlutterApplication;
+import io.flutter.plugin.common.PluginRegistry;
+import io.flutter.plugins.GeneratedPluginRegistrant;
+import io.flutter.plugins.androidalarmmanager.AlarmService;
+import io.flutter.plugins.androidalarmmanager.AndroidAlarmManagerPlugin;
 
-public class Application extends FlutterApplication {
-
-
+public class Application extends FlutterApplication implements PluginRegistry.PluginRegistrantCallback {
     @Override
     public void onCreate() {
-        super.onCreate();
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel("messages","Messages", NotificationManager.IMPORTANCE_HIGH);
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
-        }
-
+      super.onCreate();
+      AlarmService.setPluginRegistrant(this);
     }
-
-
-}
+  
+    @Override
+    public void registerWith(PluginRegistry registry) {
+        if(registry!=null){
+            AndroidAlarmManagerPlugin.registerWith(registry.registrarFor("io.flutter.plugins.androidalarmmanager.AndroidAlarmManagerPlugin"));
+        }
+        
+    }
+  }
