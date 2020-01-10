@@ -27,7 +27,7 @@ class HomePage extends StatefulWidget{
 
 
 class _HomePageState extends State<HomePage>{
-  String title="Control Medico";
+  String title="Mi Control Medico";
   bool notificationLaunch=false;
   
   

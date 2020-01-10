@@ -22,13 +22,14 @@ class CDosisRepository{
   Future<void> generateCDosis(CTreatment cTreatment) async{
     int startInterval=0;
     int endInterval=0;
+    int frequency=cTreatment.configDosis.frequencyDays*10;
     DateTime actualDate=DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day);
     if(cTreatment.isPermanent){
       startInterval=cTreatment.lastDosisDate.toInt();
-      endInterval=startInterval+(INIT_INTERVAL_LENGTH*24*3600);
+      endInterval=startInterval+(frequency*24*3600);
     }else{
       startInterval=cTreatment.startDate.toInt()>(actualDate.millisecondsSinceEpoch~/1000) ? cTreatment.startDate.toInt():(actualDate.millisecondsSinceEpoch~/1000);
-      endInterval=(startInterval+(INIT_INTERVAL_LENGTH*24*3600)<cTreatment.endDate.toInt()) ? startInterval+(INIT_INTERVAL_LENGTH*24*3600):cTreatment.endDate.toInt();
+      endInterval=(startInterval+(frequency*24*3600)<cTreatment.endDate.toInt()) ? startInterval+(frequency*24*3600):cTreatment.endDate.toInt();
     }
 
     int initDay=startInterval;

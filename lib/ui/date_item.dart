@@ -46,7 +46,7 @@ class _DateItemState extends State<DateItem> {
     
     initializeDateFormatting();
     var formatter=new DateFormat("d MMM yyyy","es");
-    var formatterTime=new DateFormat("HH:mm","es");
+    var formatterTime=new DateFormat("HH:mm a","es");
     return GestureDetector(
       onLongPress: (){ 
         
@@ -77,7 +77,7 @@ class _DateItemState extends State<DateItem> {
                                       Divider(height: 5,color: Colors.transparent,),
                                       Text(widget.date.title,style: TextStyle(color: Colors.black,fontSize: 16)),
                                       Divider(height: 5,color: Colors.transparent,),
-                                      Text(formatterTime.format(widget.date.getTime),style: TextStyle(color: Colors.black87,fontSize: 12))
+                                      Text(formatterTime.format(widget.date.getTime).toUpperCase(),style: TextStyle(color: Colors.black87,fontSize: 12))
                                     ],
                                   ),
                         ),
