@@ -4,7 +4,7 @@ import 'package:control_medico3/model/CEvent.dart';
 
 List<CEvent> eventsReducer(List<CEvent> state,action){
   if(action is EventsLoadedAction){
-    print([...state,...action.events]);
+    //print([...state,...action.events]);
     return action.events;
   }
   return state;

@@ -11,7 +11,7 @@ import 'package:control_medico3/ui/forms/new_treatment/newTreatmentStepOne.dart'
 import 'package:control_medico3/ui/loader.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+//import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -53,7 +53,7 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
   @override
   Widget build(BuildContext context) {
     formData["type"]=CEventType.date.index;
-
+    
     initializeDateFormatting();
     var formatter=new DateFormat("d 'de' MMMM 'de' yyyy","es");
     var formatterTime=new DateFormat("hh:mm a","es");
@@ -80,20 +80,21 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
   }
 
   Widget _buildStepper(){
+    var width=MediaQuery.of(context).size.width-200;
+    var stepWidth=(width/4);
     return Container(
         decoration: BoxDecoration(
           color:Colors.white
         ),
         child:Stepper(
+          physics: ClampingScrollPhysics(),
           controlsBuilder: (BuildContext context,
                     {VoidCallback onStepContinue, VoidCallback onStepCancel}){
                       return Container(height: 0,width: 0,);
                     }    
           ,
           onStepTapped: (int index){
-            setState(() {
-              currentStep=index;
-            });
+            
           },
           onStepContinue: (){ 
             if(currentStep<2){
@@ -107,9 +108,10 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
           },
           currentStep: currentStep,
           type: StepperType.horizontal,
+          
           steps: [
             Step(
-              title: Text("Datos"),
+              title: Text(""),
               content: NewTreatmentStepOne(onContinue: (formData){
                 if(widget.edition){
                   StoreProvider.of<AppState>(context).dispatch(UpdateTreatmentSubmitStepOne(formData));
@@ -122,7 +124,7 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
               isActive: currentStep==0
             ),
             Step(
-              title: Text("Administracion"),
+              title: Text(""),
               content: NewTreatmentStepTwo(onContinue: (CTreatment treatment){
                 if(widget.edition){
                   StoreProvider.of<AppState>(context).dispatch(UpdateTreatmentSubmitStepTwo(treatment));
@@ -138,7 +140,7 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
               isActive: currentStep==1
             ),
             Step(
-              title: Text("dosis"),
+              title: Text(""),
               content: NewTreatmentStepThree(onContinue: (CTreatment treatment) async{
                 if(widget.edition){
                   StoreProvider.of<AppState>(context).dispatch(UpdateTreatmentAction(treatment));
@@ -154,7 +156,8 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
                 });
               },),
               isActive: currentStep==2
-            )
+            ),
+            
           ],
         ) ,
       );
@@ -167,7 +170,12 @@ class _NewTreatmentFormState extends State<NewTreatmentForm>{
     Widget _buildLoaderDialog(){
       return AlertDialog(
           title: Text("Añadir Tratamiento"),
-          content: Loader(),
+          content: Container(
+            height: 100,
+            child:Center(
+              child: CircularProgressIndicator()
+            )
+          )
           
         );
     }

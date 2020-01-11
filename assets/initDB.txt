@@ -29,5 +29,9 @@ CREATE TABLE  IF NOT EXISTS config_dosis (
     frequencyDays INTEGER,
     diaryTimes INTEGER,
     dosisTime TEXT
+)$
+CREATE TABLE IF NOT EXISTS settings(
+    initialDate INTEGER DEFAULT 0
 )
+
 

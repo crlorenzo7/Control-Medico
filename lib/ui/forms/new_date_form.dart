@@ -8,7 +8,7 @@ import 'package:control_medico3/model/enumerations/CEventType.dart';
 import 'package:control_medico3/repository/CEventRepository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+//import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -80,7 +80,7 @@ class _NewDateFormState extends State<NewDateForm>{
   Widget _buildForm(FormAddDateState state){
     initializeDateFormatting();
     var formatter=new DateFormat("d 'de' MMMM 'de' yyyy","es");
-    var formatterTime=new DateFormat("hh:mm a","es");
+    var formatterTime=new DateFormat("hh:mm a");
 
     if(!isInitialized){
       if(state.date!=null){
@@ -189,7 +189,7 @@ class _NewDateFormState extends State<NewDateForm>{
                                     children: <Widget>[
                                       
                                       TextFormField(
-                                        controller: TextEditingController(text:time!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(time*1000)):null,),
+                                        controller: TextEditingController(text:time!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(time*1000).toUtc()):null,),
                                         //initialValue: dosisTime[index]!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000)).toUpperCase():null,
                                         validator: (value) {
                                           if (value.isEmpty) {

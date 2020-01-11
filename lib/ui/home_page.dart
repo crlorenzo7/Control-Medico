@@ -14,6 +14,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
 
+import 'history_page.dart';
+
 
 class HomePage extends StatefulWidget{
   
@@ -76,7 +78,7 @@ class _HomePageState extends State<HomePage>{
                     Tab(text: "AGENDA"),
                     Tab(text: "CITAS"),
                     Tab(text: "TRATAMIENTOS"),
-                    Tab(icon:Icon(Icons.calendar_today))
+                    Tab(text: "HISTORIAL")
                   ],
                 )
               ),
@@ -94,7 +96,9 @@ class _HomePageState extends State<HomePage>{
                       TreatmentsPage(onInit:(){
                         StoreProvider.of<AppState>(context).dispatch(LoadTreatmentsAction());
                       }),
-                      Icon(Icons.calendar_today),
+                      HistoryPage(onInit:(){
+                        StoreProvider.of<AppState>(context).dispatch(InitHistoryAction());
+                      }),
                     ],
                   )
                 )

@@ -9,7 +9,7 @@ import 'package:control_medico3/model/enumerations/CBodyZone.dart';
 import 'package:control_medico3/model/enumerations/MedicationType.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+//import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';

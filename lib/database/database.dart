@@ -38,6 +38,7 @@ class DBProvider{
         await db.execute(table);
       }
     }
+    db.execute("INSERT INTO settings(initialDate) values(${(DateTime.now().millisecondsSinceEpoch~/1000)})");
   }
 
   void onUpgrade(Database database, int oldVersion, int newVersion) {
