@@ -267,7 +267,7 @@ class _NewTreatmentStepThreeState extends State<NewTreatmentStepThree> {
                                     
                                     CConfigDosis config=CConfigDosis.fromMap(state.treatment.configDosis.toMap());
                                     config.diaryTimes = diaryTimes;
-                                    config.frequencyDays=frequencyDays;
+                                    config.frequencyDays=frequencyDays*timelapseSelected["value"];
                                     config.dosisTime=dosisTime;
                                     treatment.configDosis=config;
                                     
@@ -341,7 +341,7 @@ class _NewTreatmentStepThreeState extends State<NewTreatmentStepThree> {
                     children: <Widget>[
                       
                       TextFormField(
-                        controller: TextEditingController(text:dosisTime[index]!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000)).toUpperCase():null,),
+                        controller: TextEditingController(text:dosisTime[index]!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000).toUtc()).toUpperCase():null,),
                         //initialValue: dosisTime[index]!=null ? formatterTime.format(DateTime.fromMillisecondsSinceEpoch(dosisTime[index]*1000)).toUpperCase():null,
                         validator: (value) {
                           if (value.isEmpty) {

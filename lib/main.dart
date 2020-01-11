@@ -14,6 +14,7 @@ import 'package:control_medico3/ui/home_page.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 //import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 
@@ -47,7 +48,13 @@ class MyApp extends StatelessWidget {
       store:store,
       child:MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Control Medico Flutter',
+        localizationsDelegates: [
+          GlobalCupertinoLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: const[Locale('es'),Locale('en','US'),],
+        title: 'Mi Control Medico',
         theme: ThemeData(primarySwatch: Colors.indigo),
         home: HomePage(),
       )

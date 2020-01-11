@@ -14,5 +14,6 @@ class CEventRepository{
   Future updateCEvent(CEvent cEvent)=>eventDao.updateCEvent(cEvent);
   Future deleteCEvent(int id)=>eventDao.deleteCEvent(id);
   Future deleteAllCEvents()=>eventDao.deleteAllCEvents();
+  Future initHistory()=>eventDao.getSettings();
   
 }

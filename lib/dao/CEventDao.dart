@@ -13,6 +13,19 @@ class CEventDao{
     return result;
   }
 
+  Future<int> getSettings() async{
+    var db=await dbProvider.database;
+    var result = await db.query(
+      "settings"
+      );
+    Map<String,dynamic> nullMap=Map();
+    nullMap["initialDate"]=0;
+    Map<String,dynamic> settingsMap=result.isEmpty ? nullMap:result[0];
+    return settingsMap["initialDate"];
+  }
+
+
+
   Future<List<CEvent>> getCEvents(List<String> columns,Map<String,dynamic> query) async{
     var db=await dbProvider.database;
   
@@ -22,6 +35,31 @@ class CEventDao{
     List<dynamic> whereArgs=[nowTime];
 
     if(query!=null){
+      if(query["historyTime"]!=null){
+        int minTime=query["historyTime"];
+
+        DateTime initDate=DateTime.fromMillisecondsSinceEpoch(minTime*1000);
+
+        int initYear=initDate.year;
+        int initMonth=initDate.month;
+
+        int year=(initDate.year);
+        int month=(initDate.month+1);
+        if(month==13){month=1;year+=1;}
+
+        minTime=(DateTime(initYear,initMonth).millisecondsSinceEpoch~/1000);
+        int maxTime=(DateTime(year,month).millisecondsSinceEpoch~/1000);
+
+        if(maxTime>nowTime){
+          maxTime=nowTime;
+        }
+
+        whereClause="time >= ? and time <= ? ";
+        sortClause="time asc";
+        whereArgs=[minTime,maxTime];
+      }
+
+    
       query.forEach((k,v){
         switch(k){
           case "title":{

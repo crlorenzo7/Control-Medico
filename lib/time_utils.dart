@@ -20,6 +20,7 @@ class TimeUtils{
     DateTime current=date!=null ? DateTime.fromMillisecondsSinceEpoch(date*1000):null;
     final DateTime picked = await showDatePicker(
         context: context,
+        locale: Locale('es'),
         initialDate: current ?? DateTime.now(),
         firstDate: DateTime(1900),
         lastDate: DateTime(2101));
