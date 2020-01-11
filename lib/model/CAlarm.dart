@@ -12,7 +12,7 @@ import 'package:flutter/services.dart';
 
 void launchAlarm() async{
   if(Platform.isAndroid){
-      var methodChannel = MethodChannel("com.example.control_medico3.messages");
+      var methodChannel = MethodChannel("com.control_medico3.messages");
       String data = await methodChannel.invokeMethod("scheduleAlarm");
       debugPrint(data);
     }
@@ -51,7 +51,7 @@ class CAlarm implements Avisos{
   @override
   Future<void> send(CEvent event) async {
     if(Platform.isAndroid){
-      var methodChannel = MethodChannel("com.example.control_medico3.messages");
+      var methodChannel = MethodChannel("com.control_medico3.messages");
       Map<dynamic,dynamic> arg=new Map<dynamic,dynamic>();
       arg["event"]=event.toMap();
       String data = await methodChannel.invokeMethod("scheduleAlarm",arg);
@@ -63,7 +63,7 @@ class CAlarm implements Avisos{
 
   @override
   Future<void> cancel(CEvent event) async {
-    var methodChannel = MethodChannel("com.example.control_medico3.messages");
+    var methodChannel = MethodChannel("com.control_medico3.messages");
       Map<dynamic,dynamic> arg=new Map<dynamic,dynamic>();
       arg["id"]=event.id;
       String data = await methodChannel.invokeMethod("cancelAlarm",arg);
