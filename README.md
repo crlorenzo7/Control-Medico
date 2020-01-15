@@ -1,16 +1,18 @@
-# control_medico3
+# Mi Control Medico
 
-A new Flutter project.
+Mi Control medico es una aplicacion para Android desarrollada con flutter que te ayuda a tomar tu medicacion en el momento adecuado y te avisa de tus proximas citas medicas.
 
-## Getting Started
+De forma sencilla podras llevar el control de tus citas medicas y de tus tratamientos en unos pocos pasos
 
-This project is a starting point for a Flutter application.
+Funcionalidades de la aplicación
 
-A few resources to get you started if this is your first Flutter project:
+### Tratamientos
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+podras añadir tus tratamiento en unos pocos pasos especificando la duracion del tratamiento o si es permanente, el tipo de tratamiento (pastillas, sobres, jarabe, inyecciones...), el intervalo de tiempo entre dosis, y en caso de las inyecciones podras especificar tambien las zonas del cuerpo donde te aplicas la inyeccion y como debe ser el orden de rotacion de estas, de esta forma la aplicacion generara las dosis automaticamente.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Citas
+Podras añadir tus siguientes citas con el medico y asi llevar todo el control en una sola aplicacion
+
+### Enlace de Google Play
+
+https://play.google.com/store/apps/details?id=com.control_medico3
